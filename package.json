@@ -19,7 +19,8 @@
     "helmet": "^8.1.0",
     "joi": "^17.13.3",
     "mongoose": "^8.16.0",
-    "morgan": "^1.10.0"
+    "morgan": "^1.10.0",
+    "node-cache": "^5.1.2"
   },
   "devDependencies": {
     "nodemon": "^3.1.10"
