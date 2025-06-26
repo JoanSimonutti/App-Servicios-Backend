@@ -24,55 +24,65 @@
 
 // Punto de entrada principal del backend. Aquí se inicializa el servidor Express,
 // se conectan los middlewares, la base de datos y se definen las rutas de la API.
-// Importamos módulos necesarios
-const express = require("express");
-const serverless = require("serverless-http");
-const cors = require("cors");
-const helmet = require("helmet");
-const compression = require("compression");
-const morgan = require("morgan");
-const dotenv = require("dotenv");
-const path = require("path");
+///////////////////////////////////////////////////////////////////////////////////////
+// index.js – Punto de entrada principal del backend en Render
+// Inicializa Express, configura seguridad, middleware, rutas y lanza el servidor.
+///////////////////////////////////////////////////////////////////////////////////////
 
-// Cargamos variables de entorno desde /api/.env si está en local
+// Importamos los módulos necesarios
+const express = require("express");                  // Framework web principal
+const cors = require("cors");                        // Permite llamadas desde otros dominios (CORS)
+const helmet = require("helmet");                    // Seguridad por cabeceras HTTP
+const compression = require("compression");          // Comprime respuestas HTTP (mejora rendimiento)
+const morgan = require("morgan");                    // Middleware de logging
+const dotenv = require("dotenv");                    // Carga variables de entorno desde .env
+const path = require("path");                        // Módulo nativo de Node para rutas de archivos
+
+// Cargamos variables de entorno desde /api/.env si está en desarrollo local
 dotenv.config({ path: path.join(__dirname, ".env") });
 
+// Importamos conexión a la base de datos y rutas
 const connectDB = require("./db");
 const serviceRoutes = require("./routes/services");
 const clickRoutes = require("./routes/clicks");
 
-// Creamos la app de Express
+// Creamos la instancia de Express
 const app = express();
 
-// Conectamos con MongoDB solo una vez
+// Conectamos a MongoDB (una sola vez)
 connectDB();
 
-// Middlewares
-app.use(helmet());
-app.use(compression());
-app.use(cors());
-app.use(morgan("dev"));
-app.use(express.json());
+// Aplicamos middlewares globales
+app.use(helmet());                 // Seguridad HTTP
+app.use(compression());           // Comprimir respuestas
+app.use(cors());                  // Permitir CORS
+app.use(morgan("dev"));           // Logs de peticiones
+app.use(express.json());          // Parsear JSON en requests
 
-// Rutas principales
+// Rutas principales de la API
 app.use("/api/services", serviceRoutes);
 app.use("/api/clicks", clickRoutes);
 
-// Ruta raíz para prueba
+// Ruta base de prueba
 app.get("/", (req, res) => {
-    res.send("API de Servicios funcionando en Vercel Serverless");
+    res.send("API de Servicios funcionando en Render");
 });
 
-// Middleware 404
+// Middleware 404 (ruta no encontrada)
 app.use((req, res) => {
     res.status(404).json({ error: "Ruta no encontrada" });
 });
 
-// Middleware de errores
+// Middleware global de manejo de errores
 app.use((err, req, res, next) => {
     console.error("Error inesperado:", err);
     res.status(500).json({ error: "Error interno del servidor" });
 });
 
-// Exportamos el handler que Vercel usará
-module.exports = serverless(app);
+// Obtenemos el puerto desde las variables de entorno (Render lo asigna automáticamente)
+const PORT = process.env.PORT || 10000;
+
+// Iniciamos el servidor y lo dejamos escuchando
+app.listen(PORT, () => {
+    console.log(`Backend escuchando en puerto ${PORT}`);
+});
