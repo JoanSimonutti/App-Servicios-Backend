@@ -140,7 +140,6 @@ router.post("/", async (req, res) => {
             horaHasta: Joi.number().min(0).max(23).greater(Joi.ref("horaDesde")).required(),
             urgencias24hs: Joi.boolean().required(),
             localidadesCercanas: Joi.boolean().required(),
-            fotoUrl: Joi.string().uri().required()
         });
 
         const { error } = schemaPost.validate(req.body);
@@ -156,7 +155,6 @@ router.post("/", async (req, res) => {
             horaHasta: req.body.horaHasta,
             urgencias24hs: req.body.urgencias24hs,
             localidadesCercanas: req.body.localidadesCercanas,
-            fotoUrl: req.body.fotoUrl
         });
 
         const resultado = await nuevoServicio.save();
@@ -183,7 +181,6 @@ router.put("/:id", async (req, res) => {
             horaHasta: Joi.number().min(0).max(23).greater(Joi.ref("horaDesde")),
             urgencias24hs: Joi.boolean(),
             localidadesCercanas: Joi.boolean(),
-            fotoUrl: Joi.string().uri()
         });
 
         const { error } = schemaPut.validate(req.body);
