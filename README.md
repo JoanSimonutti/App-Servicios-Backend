@@ -53,12 +53,12 @@
 
 **Este backend está preparado para:**
 
+- Estar desplegado en Render.
+- Ser ejecutado localmente para implementar cambios y pruebas sin afectar el entorno de producción.
 - Soportar tráfico real de usuarios.
 - Ser consumido por un frontend moderno.
 - Ofrecer estadísticas reales sobre el contacto a prestadores.
 - Escalar a mayores volúmenes de datos.
-- Estar desplegado en Render.
-- Ser ejecutado localmente en modo desarrollo para implementar cambios y pruebas sin afectar el entorno de producción.
 
 ---
 
