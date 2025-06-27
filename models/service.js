@@ -118,18 +118,6 @@ const serviceSchema = new mongoose.Schema({
         default: false
     },
 
-    // URL pública de la imagen del prestador. Validamos que sea una URL de imagen válida.
-    fotoUrl: {
-        type: String,
-        required: true,
-        validate: {
-            validator: function (v) {
-                return /^https?:\/\/.+\.(jpg|jpeg|png|webp)$/.test(v);
-            },
-            message: props => `La URL ${props.value} no es válida para una imagen`
-        }
-    }
-
 }, {
     // Agregamos timestamps automáticos: createdAt y updatedAt
     timestamps: true
