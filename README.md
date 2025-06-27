@@ -57,8 +57,7 @@
 - Ser consumido por un frontend moderno.
 - Ofrecer estadísticas reales sobre el contacto a prestadores.
 - Escalar a mayores volúmenes de datos.
-- Estar desplegado en Render y disponible en:
-  - https://app-servicios-backend.onrender.com
+- Estar desplegado en Render.
 - Ser ejecutado localmente en modo desarrollo para implementar cambios y pruebas sin afectar el entorno de producción.
 
 ---
