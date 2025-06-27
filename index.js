@@ -30,13 +30,13 @@
 ///////////////////////////////////////////////////////////////////////////////////////
 
 // Importamos los módulos necesarios
-const express = require("express");                  // Framework web principal
-const cors = require("cors");                        // Permite llamadas desde otros dominios (CORS)
-const helmet = require("helmet");                    // Seguridad por cabeceras HTTP
-const compression = require("compression");          // Comprime respuestas HTTP (mejora rendimiento)
-const morgan = require("morgan");                    // Middleware de logging
-const dotenv = require("dotenv");                    // Carga variables de entorno desde .env
-const path = require("path");                        // Módulo nativo de Node para rutas de archivos
+const express = require("express");          // Framework web principal
+const cors = require("cors");                // Permite llamadas desde otros dominios (CORS)
+const helmet = require("helmet");            // Seguridad por cabeceras HTTP
+const compression = require("compression");  // Comprime respuestas HTTP (mejora rendimiento)
+const morgan = require("morgan");            // Middleware de logging
+const dotenv = require("dotenv");            // Carga variables de entorno desde .env
+const path = require("path");                // Módulo nativo de Node para rutas de archivos
 
 // Cargamos variables de entorno desde /api/.env si está en desarrollo local
 dotenv.config({ path: path.join(__dirname, ".env") });
@@ -60,8 +60,8 @@ app.use(morgan("dev"));           // Logs de peticiones
 app.use(express.json());          // Parsear JSON en requests
 
 // Rutas principales de la API
-app.use("/api/services", serviceRoutes);
-app.use("/api/clicks", clickRoutes);
+app.use("/services", serviceRoutes);
+app.use("/clicks", clickRoutes);
 
 // Ruta base de prueba
 app.get("/", (req, res) => {
