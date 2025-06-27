@@ -35,7 +35,7 @@
 
 ### Registro de clics (`/clic`)
 
-- Registra cuándo un usuario contacta a un prestador en WhatsApp o Teléfono.
+- Registra cuándo un usuario contacta a un prestador.
 - Guarda: ID del prestador, tipo de clic, fecha/hora.
 - Permite consultar todos los clics registrados y filtrar por ID de prestador.
 
