@@ -53,15 +53,15 @@ const app = express();
 connectDB();
 
 // Aplicamos middlewares globales
-app.use(helmet());                 // Seguridad HTTP
+app.use(helmet());                // Seguridad HTTP
 app.use(compression());           // Comprimir respuestas
 app.use(cors());                  // Permitir CORS
 app.use(morgan("dev"));           // Logs de peticiones
 app.use(express.json());          // Parsear JSON en requests
 
 // Rutas principales de la API
-app.use("/services", serviceRoutes);
-app.use("/clicks", clickRoutes);
+app.use("/serv", serviceRoutes); // https://app-servicios-backend.onrender.com/serv (solo 4 letras para cometer menos errores de tipeo, pero)
+app.use("/clic", clickRoutes);   // https://app-servicios-backend.onrender.com/clic (si en un futuro la app crece y necesitamos modificar las rutas lo hacemos)
 
 // Ruta base de prueba
 app.get("/", (req, res) => {
