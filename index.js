@@ -86,3 +86,16 @@ const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => {
     console.log(`Backend escuchando en puerto ${PORT}`);
 });
+
+
+// ENDPOINTS
+// Para Servicios:
+// GET /serv
+// POST /serv
+// GET /serv/:id
+// PUT /serv/:id
+// DELETE /serv/:id
+
+// Para Clicks:
+// GET /clic
+// POST /clic
