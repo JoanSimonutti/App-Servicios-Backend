@@ -2,7 +2,7 @@
 
 - Backend profesional diseñado para gestionar un catálogo de prestadores de servicios y registrar interacciones de usuarios.
 
-- Permite almacenar, consultar, filtrar, crear, modificar y eliminar perfiles de prestadores con toda su información.
+- Permite crear, almacenar, consultar, filtrar, modificar y eliminar perfiles de prestadores con toda su información.
 
 ### Tecnologías utilizadas:
 
@@ -51,7 +51,7 @@
 
 ## Resultado
 
-**El backend está preparado para:**
+**Este backend está preparado para:**
 
 - Soportar tráfico real de usuarios.
 - Ser consumido por un frontend moderno.
