@@ -65,7 +65,7 @@ app.use("/api/clicks", clickRoutes);
 
 // Ruta base de prueba
 app.get("/", (req, res) => {
-    res.send("API de Servicios funcionando en Render");
+    res.send("Backend de App-Servicios iniciado correctamente");
 });
 
 // Middleware 404 (ruta no encontrada)
