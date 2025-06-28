@@ -14,6 +14,9 @@ const cache = new NodeCache({ stdTTL: 60 }); // TTL: 60 segundos
 
 ///////////////////////////////////////////////////////////////////////////////////////
 // GET - Listado de todos los servicios
+// Devuelve:
+// - total: cantidad total de servicios que cumplen el filtro.
+// - data: array de servicios (limit + skip).
 ///////////////////////////////////////////////////////////////////////////////////////
 
 router.get("/", async (req, res) => {
@@ -27,7 +30,7 @@ router.get("/", async (req, res) => {
             nombre: Joi.string(),
             urgencias24hs: Joi.string().valid("true", "false"),
             localidadesCercanas: Joi.string().valid("true", "false"),
-            localidad: Joi.string(), // nuevo filtro por localidad exacta
+            localidad: Joi.string(),
             hora: Joi.number().min(0).max(23),
             limit: Joi.number().min(1).max(100),
             skip: Joi.number().min(0),
@@ -69,9 +72,18 @@ router.get("/", async (req, res) => {
         }
 
         // Armamos la clave de cache con los parámetros de búsqueda
-        const cacheKey = JSON.stringify({ filtro, limit: req.query.limit, skip: req.query.skip, sort: req.query.sort });
+        const cacheKey = JSON.stringify({
+            filtro,
+            limit: req.query.limit,
+            skip: req.query.skip,
+            sort: req.query.sort
+        });
+
         const cacheResultado = cache.get(cacheKey);
-        if (cacheResultado) return res.json(cacheResultado);
+        if (cacheResultado) {
+            console.log("Obtenido de cache:", cacheKey);
+            return res.json(cacheResultado);
+        }
 
         // Construimos la query
         let query = Service.find(filtro);
@@ -84,15 +96,23 @@ router.get("/", async (req, res) => {
             query = query.sort(campos);
         }
 
+        // Ejecutamos la query
         const resultado = await query.exec();
 
-        cache.set(cacheKey, resultado); // Guardamos en cache
-        res.json(resultado);
+        // Calculamos el total de documentos que cumplen el filtro (sin paginar)
+        const total = await Service.countDocuments(filtro);
+
+        // Guardamos en cache el objeto completo (total + data)
+        const respuesta = { total, data: resultado };
+        cache.set(cacheKey, respuesta);
+
+        res.json(respuesta);
     } catch (err) {
         console.error("Error al obtener servicios:", err);
         res.status(500).json({ error: "Error interno del servidor" });
     }
 });
+
 
 ///////////////////////////////////////////////////////////////////////////////////////
 // GET - Obtener solo un servicio identificado por el ID
