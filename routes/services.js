@@ -16,6 +16,7 @@ const cache = new NodeCache({ stdTTL: 60 }); // TTL: 60 segundos
 // GET - Listado de todos los servicios
 ///////////////////////////////////////////////////////////////////////////////////////
 
+/* LO comento por un tiempo, para ver si el codigo nuevo funciona sin romper nada, si el nuevo codigo funciona a la perfeccion eliminar de la linea 19 a la 97 
 router.get("/", async (req, res) => {
     try {
         // Validamos los parámetros de consulta para evitar datos basura
@@ -93,6 +94,161 @@ router.get("/", async (req, res) => {
         res.status(500).json({ error: "Error interno del servidor" });
     }
 });
+*/
+
+///////////////////////////////////////////////////////////////////////////////////////
+// GET - Listado de todos los servicios (MODIFICADO PARA DEVOLVER TOTAL)
+// 
+// Ahora devuelve:
+// {
+//   total: <cantidad total de servicios que cumplen el filtro>,
+//   data: [ ... datos paginados ... ]
+// }
+// 
+// Esto permite al frontend saber:
+// - Cuántos registros hay en total para mostrar el contador.
+// - Cuáles se están mostrando actualmente (scroll infinito).
+///////////////////////////////////////////////////////////////////////////////////////
+
+router.get("/", async (req, res) => {
+    try {
+        /////////////////////////////////////////////////
+        // VALIDACIÓN DE QUERY PARAMS CON JOI
+        /////////////////////////////////////////////////
+
+        const schema = Joi.object({
+            categoria: Joi.string(),
+            categorias: Joi.string(),
+            tipoServicio: Joi.string(),
+            tipoServicioLike: Joi.string(),
+            nombre: Joi.string(),
+            urgencias24hs: Joi.string().valid("true", "false"),
+            localidadesCercanas: Joi.string().valid("true", "false"),
+            localidad: Joi.string(),
+            hora: Joi.number().min(0).max(23),
+            limit: Joi.number().min(1).max(100),
+            skip: Joi.number().min(0),
+            sort: Joi.string()
+        });
+
+        const { error } = schema.validate(req.query);
+        if (error) {
+            return res.status(400).json({ error: error.details[0].message });
+        }
+
+        /////////////////////////////////////////////////
+        // CONSTRUCCIÓN DEL FILTRO
+        /////////////////////////////////////////////////
+
+        const filtro = {};
+
+        if (req.query.categoria) filtro.categoria = req.query.categoria;
+
+        if (req.query.categorias) {
+            const categoriasArray = req.query.categorias.split(",");
+            filtro.categoria = { $in: categoriasArray };
+        }
+
+        if (req.query.tipoServicio) filtro.tipoServicio = req.query.tipoServicio;
+
+        if (req.query.tipoServicioLike) {
+            filtro.tipoServicio = new RegExp(req.query.tipoServicioLike, "i");
+        }
+
+        if (req.query.nombre) {
+            filtro.nombre = new RegExp(req.query.nombre, "i");
+        }
+
+        if (req.query.urgencias24hs === "true") filtro.urgencias24hs = true;
+        if (req.query.urgencias24hs === "false") filtro.urgencias24hs = false;
+
+        if (req.query.localidadesCercanas === "true") filtro.localidadesCercanas = true;
+        if (req.query.localidadesCercanas === "false") filtro.localidadesCercanas = false;
+
+        if (req.query.localidad) filtro.localidad = req.query.localidad;
+
+        if (req.query.hora) {
+            filtro.horaDesde = { $lte: req.query.hora };
+            filtro.horaHasta = { $gt: req.query.hora };
+        }
+
+        /////////////////////////////////////////////////
+        // CLAVE DE CACHE
+        /////////////////////////////////////////////////
+
+        const cacheKey = JSON.stringify({
+            filtro,
+            limit: req.query.limit,
+            skip: req.query.skip,
+            sort: req.query.sort
+        });
+
+        const cacheResultado = cache.get(cacheKey);
+        if (cacheResultado) {
+            console.log("Obtenido de cache:", cacheKey);
+            return res.json(cacheResultado);
+        }
+
+        /////////////////////////////////////////////////
+        // CONSTRUCCIÓN DE LA QUERY MONGOOSE
+        /////////////////////////////////////////////////
+
+        let query = Service.find(filtro);
+
+        if (req.query.limit) {
+            query = query.limit(Number(req.query.limit));
+        }
+
+        if (req.query.skip) {
+            query = query.skip(Number(req.query.skip));
+        }
+
+        if (req.query.sort) {
+            const campos = req.query.sort.split(",").join(" ");
+            query = query.sort(campos);
+        }
+
+        /////////////////////////////////////////////////
+        // EJECUTAMOS LA QUERY PARA DATOS PÁGINADOS
+        /////////////////////////////////////////////////
+
+        const resultado = await query.exec();
+
+        /////////////////////////////////////////////////
+        // CALCULAMOS EL TOTAL DE DOCUMENTOS
+        /////////////////////////////////////////////////
+
+        // Esto cuenta cuántos documentos cumplen el filtro,
+        // SIN aplicar limit ni skip.
+        const total = await Service.countDocuments(filtro);
+
+        /////////////////////////////////////////////////
+        // CONSTRUIMOS LA RESPUESTA FINAL
+        /////////////////////////////////////////////////
+
+        const respuesta = {
+            total: total,
+            data: resultado
+        };
+
+        /////////////////////////////////////////////////
+        // GUARDAMOS EN CACHE
+        /////////////////////////////////////////////////
+
+        cache.set(cacheKey, respuesta);
+
+        /////////////////////////////////////////////////
+        // DEVOLVEMOS LA RESPUESTA AL FRONTEND
+        /////////////////////////////////////////////////
+
+        res.json(respuesta);
+
+    } catch (err) {
+        console.error("Error al obtener servicios:", err);
+        res.status(500).json({ error: "Error interno del servidor" });
+    }
+});
+
 
 ///////////////////////////////////////////////////////////////////////////////////////
 // GET - Obtener solo un servicio identificado por el ID
