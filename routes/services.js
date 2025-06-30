@@ -95,22 +95,6 @@ router.get("/", async (req, res) => {
 });
 
 ///////////////////////////////////////////////////////////////////////////////////////
-// GET - Listar categorías posibles según el Enum del Schema
-///////////////////////////////////////////////////////////////////////////////////////
-
-router.get("/categorias", (req, res) => {
-    try {
-        const categoriasEnum = Service.schema.path("categoria").enumValues;
-        res.json(categoriasEnum.sort());
-    } catch (err) {
-        console.error("Error al obtener categorías del Enum:", err);
-        res.status(500).json({ error: "Error interno del servidor" });
-    }
-});
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////
 // GET - Obtener solo un servicio identificado por el ID
 ///////////////////////////////////////////////////////////////////////////////////////
 
