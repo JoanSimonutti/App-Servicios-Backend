@@ -1,6 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////
 // ¿Qué hace api/index.js?
-// Este archivo es el punto de entrada principal de tu backend. 
+// Este archivo es el punto de entrada principal de tu backend.
+
 // Su función es:
 // Crear la instancia del servidor Express.
 // Configurar middlewares para lectura de JSON y manejo de CORS.
@@ -20,11 +21,11 @@
 // Monitoreo: morgan muestra qué peticiones llegan (muy útil en desarrollo).
 // Robustez: manejo correcto de rutas inválidas y errores inesperados.
 // Escalabilidad: estructura clara, preparada para crecer.
-///////////////////////////////////////////////////////////////////////////////////////
 
-// Punto de entrada principal del backend. Aquí se inicializa el servidor Express,
-// se conectan los middlewares, la base de datos y se definen las rutas de la API.
 ///////////////////////////////////////////////////////////////////////////////////////
+// Aquí se inicializa el servidor Express, se conectan los middlewares, la base de datos
+// y se definen las rutas de la API.
+
 // index.js – Punto de entrada principal del backend en Render
 // Inicializa Express, configura seguridad, middleware, rutas y lanza el servidor.
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -37,6 +38,10 @@ const compression = require("compression");  // Comprime respuestas HTTP (mejora
 const morgan = require("morgan");            // Middleware de logging
 const dotenv = require("dotenv");            // Carga variables de entorno desde .env
 const path = require("path");                // Módulo nativo de Node para rutas de archivos
+
+// Importamos librerías para autenticación
+const authRoutes = require("./routes/auth");              // Rutas de autenticación
+const authMiddleware = require("./middleware/authMiddleware"); // Middleware para proteger rutas privadas
 
 // Cargamos variables de entorno desde /api/.env si está en desarrollo local
 dotenv.config({ path: path.join(__dirname, ".env") });
@@ -63,6 +68,27 @@ app.use(express.json());          // Parsear JSON en requests
 app.use("/serv", serviceRoutes); // https://app-servicios-backend.onrender.com/serv (solo 4 letras para cometer menos errores de tipeo, pero)
 app.use("/clic", clickRoutes);   // https://app-servicios-backend.onrender.com/clic (si en un futuro la app crece y necesitamos modificar las rutas lo hacemos)
 
+// Rutas de autenticación
+app.use("/auth", authRoutes);    // https://app-servicios-backend.onrender.com/auth
+
+///////////////////////////////////////////////////////////////////////////////////////
+// Ejemplo de ruta privada protegida por JWT
+
+// Esta ruta solo podrá ser accedida si el cliente envía correctamente
+// un token JWT válido en el header Authorization.
+
+// Ejemplo de cómo consumirla:
+// GET /privado
+// Authorization: Bearer <token>
+///////////////////////////////////////////////////////////////////////////////////////
+
+app.get("/privado", authMiddleware, (req, res) => {
+    res.json({
+        mensaje: "Accediste a una ruta privada con éxito.",
+        usuario: req.user
+    });
+});
+
 // Ruta base de prueba
 app.get("/", (req, res) => {
     res.send("Backend de App-Servicios iniciado correctamente");
@@ -87,15 +113,22 @@ app.listen(PORT, () => {
     console.log(`Backend escuchando en puerto ${PORT}`);
 });
 
-
-// ENDPOINTS
-// Para Servicios:
+///////////////////////////////////////////////////////////////////////////////////////
+// ENDPOINTS para Servicios:
 // GET /serv
 // POST /serv
 // GET /serv/:id
 // PUT /serv/:id
 // DELETE /serv/:id
 
-// Para Clicks:
+// ENDPOINTS para Clicks:
 // GET /clic
 // POST /clic
+
+// ENDPOINTS para autenticación:
+// POST /auth/register → para solicitar el SMS de verificación
+// POST /auth/verify   → para verificar el código y recibir el JWT
+//
+// Ruta privada de ejemplo:
+// GET /privado (protegida con JWT)
+///////////////////////////////////////////////////////////////////////////////////////
