@@ -1,0 +1,219 @@
+///////////////////////////////////////////////////////////////////////////////////////
+// ¿Qué hace este archivo auth.js?
+// Es la pieza fundamental para nuestro login solo con SMS
+
+// /auth/register:
+// recibe teléfono
+// genera código
+// envía SMS
+
+// /auth/verify:
+// recibe teléfono + código
+// valida
+// devuelve JWT
+
+// Ventajas de este archivo:
+// - Seguridad: maneja el ciclo completo de autenticación.
+// - Claridad: cada ruta tiene una sola responsabilidad.
+// - Escalabilidad: fácilmente ampliable si en el futuro queremos password o refresh tokens.
+///////////////////////////////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////////////////////////////
+// Importamos las librerías y módulos necesarios
+///////////////////////////////////////////////////////////////////////////////////////
+
+const express = require("express");  // Framework web
+const router = express.Router();     // Sistema de rutas de Express
+const Joi = require("joi");          // Validaciones de datos
+const jwt = require("jsonwebtoken"); // Para generar el token JWT
+
+// Importamos el modelo User (prestador)
+const User = require("../models/user");
+
+// Importamos nuestra función para enviar SMS vía Twilio
+const sendSMS = require("../utils/sendSMS");
+
+///////////////////////////////////////////////////////////////////////////////////////
+// POST /auth/register
+// Endpoint que inicia el proceso de registro o login vía SMS.
+
+// Qué hace:
+// - Recibe el teléfono del prestador.
+// - Genera un código numérico aleatorio.
+// - Guarda ese código en la base con fecha de expiración.
+// - Envía el SMS con Twilio.
+
+// Si el usuario ya existe → actualiza el código.
+// Si no existe → crea uno nuevo.
+
+// Ejemplo request:
+// POST /auth/register
+// {
+//   "telefono": "+34123456789"
+// }
+///////////////////////////////////////////////////////////////////////////////////////
+
+router.post("/register", async (req, res) => {
+    try {
+        // Definimos el esquema Joi para validar el teléfono
+        const schema = Joi.object({
+            telefono: Joi.string().pattern(/^\+?\d{7,15}$/).required()
+        });
+
+        // Validamos los datos recibidos
+        const { error } = schema.validate(req.body);
+        if (error) {
+            return res.status(400).json({ error: error.details[0].message });
+        }
+
+        const { telefono } = req.body;
+
+        // Generamos un código aleatorio de 6 dígitos (ej: 426731)
+        const codigo = Math.floor(100000 + Math.random() * 900000).toString();
+
+        // Definimos la expiración del código (10 minutos desde ahora)
+        const codigoExpira = new Date(Date.now() + 10 * 60 * 1000);
+
+        // Buscamos si el usuario ya existe
+        let user = await User.findOne({ telefono });
+
+        if (!user) {
+            // Si NO existe → creamos un nuevo usuario
+            user = new User({
+                telefono,
+                codigoVerificacion: codigo,
+                codigoExpira,
+                verificado: false
+            });
+        } else {
+            // Si ya existe → actualizamos su código de verificación
+            user.codigoVerificacion = codigo;
+            user.codigoExpira = codigoExpira;
+            user.verificado = false;
+        }
+
+        // Guardamos el usuario en la base
+        await user.save();
+
+        // Armamos el mensaje que vamos a enviar por SMS
+        const mensajeSMS = `Tu código de verificación en SERVIPRO es: ${codigo}`;
+
+        // Enviamos el SMS real con Twilio
+        await sendSMS(telefono, mensajeSMS);
+
+        console.log(`Código enviado a ${telefono}: ${codigo}`);
+
+        // Respondemos al frontend
+        return res.json({
+            mensaje: "Código de verificación enviado por SMS."
+        });
+
+    } catch (err) {
+        console.error("Error en /auth/register:", err);
+        return res.status(500).json({ error: "Error interno del servidor." });
+    }
+});
+
+///////////////////////////////////////////////////////////////////////////////////////
+// POST /auth/verify
+// Endpoint que verifica el código ingresado por el prestador.
+
+// Qué hace:
+// - Recibe teléfono y código.
+// - Busca el usuario en base de datos.
+// - Verifica si el código coincide y no está vencido.
+// - Si está todo bien:
+//    - Marca el usuario como verificado.
+//    - Borra el código.
+//    - Genera un token JWT para autenticarlo.
+
+// Ejemplo request:
+// POST /auth/verify
+// {
+//   "telefono": "+34123456789",
+//   "codigo": "426731"
+// }
+///////////////////////////////////////////////////////////////////////////////////////
+
+router.post("/verify", async (req, res) => {
+    try {
+        // Definimos el esquema Joi para validar el input
+        const schema = Joi.object({
+            telefono: Joi.string().pattern(/^\+?\d{7,15}$/).required(),
+            codigo: Joi.string().length(6).required()
+        });
+
+        // Validamos los datos recibidos
+        const { error } = schema.validate(req.body);
+        if (error) {
+            return res.status(400).json({ error: error.details[0].message });
+        }
+
+        const { telefono, codigo } = req.body;
+
+        // Buscamos el usuario por teléfono
+        const user = await User.findOne({ telefono });
+
+        if (!user) {
+            return res.status(404).json({ error: "Usuario no encontrado." });
+        }
+
+        // Verificamos si el código coincide
+        if (user.codigoVerificacion !== codigo) {
+            return res.status(400).json({ error: "Código incorrecto." });
+        }
+
+        // Verificamos si el código está vencido
+        if (user.codigoExpira < new Date()) {
+            return res.status(400).json({ error: "El código ha expirado." });
+        }
+
+        // Marcamos el usuario como verificado
+        user.verificado = true;
+
+        // Borramos el código para que no pueda usarse de nuevo
+        user.codigoVerificacion = null;
+        user.codigoExpira = null;
+
+        await user.save();
+
+        // Creamos el payload para el JWT
+        const payload = {
+            userId: user._id,
+            telefono: user.telefono
+        };
+
+        // Firmamos el token JWT
+        const token = jwt.sign(
+            payload,
+            process.env.JWT_SECRET,
+            { expiresIn: "7d" } // Token válido 7 días
+        );
+
+        console.log(`Usuario ${telefono} verificado y JWT emitido.`);
+
+        // Respondemos al frontend con el token
+        return res.json({
+            mensaje: "Teléfono verificado correctamente.",
+            token
+        });
+
+    } catch (err) {
+        console.error("Error en /auth/verify:", err);
+        return res.status(500).json({ error: "Error interno del servidor." });
+    }
+});
+
+///////////////////////////////////////////////////////////////////////////////////////
+// Exportamos el router para que pueda integrarse en index.js
+///////////////////////////////////////////////////////////////////////////////////////
+
+module.exports = router;
+
+///////////////////////////////////////////////////////////////////////////////////////
+// Gracias a este archivo:
+// Tenemos flujo completo de registro y login solo con SMS.
+// Los prestadores están protegidos con JWT.
+// Todo el proceso está validado y es seguro.
+// Estamos listos para proteger rutas privadas en el backend.
+///////////////////////////////////////////////////////////////////////////////////////
