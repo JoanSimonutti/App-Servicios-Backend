@@ -1,0 +1,42 @@
+# ============================================
+# GITIGNORE app-servicios-back-clean
+# ============================================
+
+# Node.js dependencies
+node_modules/
+
+# Archivos de entorno (secretos)
+.env
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.log
+
+# Archivos temporales o de sistema
+.DS_Store
+Thumbs.db
+
+# Carpetas de editores
+.vscode/
+.idea/
+*.swp
+
+# Cobertura de tests (por si agregás tests más adelante)
+coverage/
+
+# Builds o dist (por si empezás a transpilar o generar builds)
+dist/
+build/
+out/
+
+# Configuraciones locales (opcional)
+*.local
+.env.local
+
+# Lock files (opcional, si no los querés trackear)
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
