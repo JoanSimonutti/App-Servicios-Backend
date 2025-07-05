@@ -134,6 +134,33 @@ app.use("/auth", authRoutes);    // https://app-servicios-backend.onrender.com/a
 // Authorization: Bearer <token>
 ///////////////////////////////////////////////////////////////////////////////////////
 
+///////////////////////////////////////////////////////////////////////////////////////
+// Rutas del perfil del prestador
+//
+// Qué hace:
+// Integra el nuevo archivo /routes/profile.js
+//
+// Todas las rutas:
+// - Solo pueden ser accedidas por prestadores autenticados.
+// - Permiten leer, modificar o borrar el propio perfil.
+// - Protegidas por JWT.
+// - Usan el teléfono extraído del token JWT.
+//
+// Endpoints creados:
+// GET    /profile
+// PUT    /profile
+// DELETE /profile
+//
+// Ejemplo de request:
+// GET /profile
+// Headers:
+//    Authorization: Bearer <token>
+///////////////////////////////////////////////////////////////////////////////////////
+
+const profileRoutes = require("./routes/profile");
+app.use("/profile", profileRoutes);
+
+
 app.get("/privado", authMiddleware, (req, res) => {
     res.json({
         mensaje: "Accediste a una ruta privada con éxito.",
