@@ -69,7 +69,7 @@ const authLimiter = rateLimit({
 
 // Importamos librerías para autenticación
 const authRoutes = require("./routes/auth");              // Rutas de autenticación
-const authMiddleware = require("./middleware/authMiddleware"); // Middleware para proteger rutas privadas
+const authMiddleware = require("./middlewares/authMiddleware"); // Middleware para proteger rutas privadas
 
 // Cargamos variables de entorno desde /api/.env si está en desarrollo local
 dotenv.config({ path: path.join(__dirname, ".env") });

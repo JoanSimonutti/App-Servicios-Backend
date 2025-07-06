@@ -201,32 +201,6 @@ router.delete("/", authMiddleware, async (req, res) => {
 });
 
 ///////////////////////////////////////////////////////////////////////////////////////
-// NOTA IMPORTANTE
-//
-// En el futuro, conviene que SOLO el admin pueda ejecutar el endpoint:
-// DELETE /profile/cleanup
-//
-// Por qué:
-// Es un endpoint peligroso si lo ejecuta un usuario común.
-// Podría borrar perfiles soft deleted antes de tiempo.
-//
-// Cómo hacerlo:
-// - Usar roles en el JWT (ej. role: "admin").
-// - Crear middleware para chequear req.user.role === "admin".
-// - Responder 403 Forbidden si no es admin.
-//
-// Ejemplo futuro:
-//
-// if (req.user.role !== "admin") {
-//     return res.status(403).json({ error: "No autorizado." });
-// }
-//
-// Por ahora:
-// - Cualquiera autenticado puede llamar cleanup.
-// - Pero confiamos en que solo Joan lo va a usar.
-//
-///////////////////////////////////////////////////////////////////////////////////////
-//
 // DELETE /profile/cleanup
 //
 // Qué hace:
@@ -271,7 +245,6 @@ router.delete("/cleanup", authMiddleware, async (req, res) => {
         return res.status(500).json({ error: "Error interno del servidor." });
     }
 });
-
 
 ///////////////////////////////////////////////////////////////////////////////////////
 // Exportamos el router para integrarlo en index.js
