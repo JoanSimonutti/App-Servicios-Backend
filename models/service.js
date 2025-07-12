@@ -51,16 +51,183 @@ const serviceSchema = new mongoose.Schema({
         type: String,
         required: true,
         enum: [
+
+            // =========================================================
+            // Categorías — Servicios para el hogar
+            // =========================================================
             "Plomería",
             "Electricidad",
             "Herrería",
             "Carpintería",
             "Gas",
             "Informática",
+            "Limpieza doméstica",
+            "Fumigación",
+            "Reparaciones generales",
+            "Climatización (aires, calefacción)",
+            "Colocación de pisos / revestimientos",
+            "Vidriería",
+            "Impermeabilización",
+            "Rejas y estructuras metálicas",
+            "Colocación de cortinas",
+            "Mantenimiento de piletas",
+            "Armado de muebles",
+            "Persianas y toldos",
+
+            // =========================================================
+            // Categorías — Servicios para el cuidado de la familia
+            // =========================================================
             "Enfermería",
-            "Limpieza",
+            "Medicina a domicilio",
+            "Niñeras",
+            "Acompañante terapéutico",
+            "Psicólogos",
+            "Fonoaudiólogos",
+            "Maestras particulares",
+            "Kinesiología",
+            "Terapias alternativas",
+            "Psicopedagogía",
+            "Fisioterapia",
+            "Cuidadores de adultos mayores",
+            "Acompañamiento escolar",
+            "Logopedas",
+            "Musicoterapia",
+            "Asistencia escolar a domicilio",
+
+            // =========================================================
+            // Categorías — Lavadero y mantenimiento
+            // =========================================================
+            "Lavadero de ropa",
+            "Lavadero de coches",
+            "Tintorerías",
+            "Limpieza de alfombras y tapizados",
+            "Limpieza industrial / comercial",
+            "Lavado de sillones",
+            "Limpieza de cortinas",
+            "Servicios de planchado",
+            "Lavado de colchones",
+            "Limpieza post obra",
+            "Limpieza de piletas",
+            "Limpieza de vidrios en altura",
+            "Lavado de tapizados de autos",
+            "Limpieza de tanques de agua",
+
+            // =========================================================
+            // Categorías — Profesionales y técnicos
+            // =========================================================
+            "Abogados",
+            "Contadores",
+            "Traductores",
+            "Asesores impositivos",
+            "Ingenieros",
+            "Arquitectos",
+            "Desarrolladores de software",
+            "Diseñadores gráficos",
+            "Marketing digital",
+            "Reparadores de electrodomésticos",
+            "Técnicos electrónicos",
+            "Electricistas matriculados",
+            "Gestores administrativos",
+            "Técnicos en refrigeración",
+            "Técnicos de PC",
+            "Diseñadores industriales",
+            "Auditores",
+            "Consultores empresariales",
+            "Gestoría vehicular",
+            "Peritos",
+            "Agrimensores",
+            "Topógrafos",
+            "Fotógrafos profesionales",
+
+            // =========================================================
+            // Categorías — Eventos y entretenimiento
+            // =========================================================
+            "Fotografía y video de eventos",
+            "Música en vivo",
+            "Animadores infantiles",
+            "Catering",
+            "Decoradores",
+            "Alquiler de livings y mobiliario",
+            "Pastelería para eventos",
+            "Organización de fiestas",
+            "Sonido e iluminación",
+            "Magos / shows",
+            "Carpas y gazebos para eventos",
+            "Bartenders",
+            "Alquiler de vajilla",
+            "Wedding planners",
+            "Food trucks",
+            "Animación para adultos",
+            "Cotillón personalizado",
+            "Escenografía para eventos",
+
+            // =========================================================
+            // Categorías — Transporte y logística
+            // =========================================================
+            "Fletes",
+            "Mudanzas",
+            "Moto mensajería",
+            "Chofer particular",
+            "Transportes especiales",
+            "Delivery de productos voluminosos",
+            "Transporte de personas",
+            "Transporte de mascotas",
+            "Cargas refrigeradas",
+            "Transporte escolar",
+            "Courier internacional",
+            "Alquiler de camionetas",
+            "Chofer profesional para empresas",
+            "Distribución de correspondencia",
+            "Traslados corporativos",
+            "Camiones con hidrogrúa",
+
+            // =========================================================
+            // Categorías — Animales y mascotas
+            // =========================================================
+            "Paseadores de perros",
+            "Peluquería canina / felina",
+            "Adiestradores",
+            "Veterinarios a domicilio",
+            "Guarderías caninas",
+            "Venta de alimentos y accesorios",
+            "Educación canina",
+            "Etología animal",
+            "Adopciones responsables",
+            "Fotografía de mascotas",
+            "Hospedaje para mascotas",
+            "Terapias alternativas animales",
+            "Spa para mascotas",
+            "Adiestramiento felino",
+
+            // =========================================================
+            // Categorías — Estética
+            // =========================================================
+            "Peluquería hombre, mujer y niños",
+            "Barberías",
+            "Cosmetología",
+            "Manicura / Pedicura",
+            "Maquillaje profesional",
+            "Depilación",
+            "Masajes estéticos",
+            "Spa a domicilio",
+            "Estética corporal",
+            "Tratamientos faciales",
+            "Microblading",
+            "Diseño de cejas",
+            "Peinados para eventos",
+            "Uñas esculpidas",
+            "Extensiones de pestañas",
+            "Micropigmentación",
+            "Limpieza facial profunda",
+            "Bronceado sin sol",
+            "Diseño de sonrisa estética",
+
+            // =========================================================
+            // Categorías originales que ya teníamos
+            // =========================================================
             "Pastelería",
-            "Huevos de Gallina",
+            "Huevos de Gallina"
+
         ],
         index: true
     },

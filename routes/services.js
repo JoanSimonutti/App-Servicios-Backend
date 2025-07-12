@@ -13,6 +13,195 @@ const NodeCache = require("node-cache"); // Biblioteca para cachear en memoria
 const cache = new NodeCache({ stdTTL: 60 }); // TTL: 60 segundos
 
 ///////////////////////////////////////////////////////////////////////////////////////
+// NUEVO:
+// Definimos el listado completo de categorías válidas.
+// Esto garantiza coherencia absoluta entre Joi y el enum del modelo Mongoose.
+//
+// Nota profesional:
+// Idealmente, en el futuro, esto debería importarse desde un archivo único
+// (p. ej. categoryGroups.js) para no duplicar listas de categorías en distintos lugares.
+// Por ahora, lo mantenemos aquí para integrarlo de forma sencilla y rápida.
+///////////////////////////////////////////////////////////////////////////////////////
+
+const VALID_CATEGORIES = [
+    // =========================================================
+    // Servicios para el hogar
+    // =========================================================
+    "Plomería",
+    "Electricidad",
+    "Herrería",
+    "Carpintería",
+    "Gas",
+    "Informática",
+    "Limpieza doméstica",
+    "Fumigación",
+    "Reparaciones generales",
+    "Climatización (aires, calefacción)",
+    "Colocación de pisos / revestimientos",
+    "Vidriería",
+    "Impermeabilización",
+    "Rejas y estructuras metálicas",
+    "Colocación de cortinas",
+    "Mantenimiento de piletas",
+    "Armado de muebles",
+    "Persianas y toldos",
+
+    // =========================================================
+    // Servicios para el cuidado de la familia
+    // =========================================================
+    "Enfermería",
+    "Medicina a domicilio",
+    "Niñeras",
+    "Acompañante terapéutico",
+    "Psicólogos",
+    "Fonoaudiólogos",
+    "Maestras particulares",
+    "Kinesiología",
+    "Terapias alternativas",
+    "Psicopedagogía",
+    "Fisioterapia",
+    "Cuidadores de adultos mayores",
+    "Acompañamiento escolar",
+    "Logopedas",
+    "Musicoterapia",
+    "Asistencia escolar a domicilio",
+
+    // =========================================================
+    // Lavadero y mantenimiento
+    // =========================================================
+    "Lavadero de ropa",
+    "Lavadero de coches",
+    "Tintorerías",
+    "Limpieza de alfombras y tapizados",
+    "Limpieza industrial / comercial",
+    "Lavado de sillones",
+    "Limpieza de cortinas",
+    "Servicios de planchado",
+    "Lavado de colchones",
+    "Limpieza post obra",
+    "Limpieza de piletas",
+    "Limpieza de vidrios en altura",
+    "Lavado de tapizados de autos",
+    "Limpieza de tanques de agua",
+
+    // =========================================================
+    // Profesionales y técnicos
+    // =========================================================
+    "Abogados",
+    "Contadores",
+    "Traductores",
+    "Asesores impositivos",
+    "Ingenieros",
+    "Arquitectos",
+    "Desarrolladores de software",
+    "Diseñadores gráficos",
+    "Marketing digital",
+    "Reparadores de electrodomésticos",
+    "Técnicos electrónicos",
+    "Electricistas matriculados",
+    "Gestores administrativos",
+    "Técnicos en refrigeración",
+    "Técnicos de PC",
+    "Diseñadores industriales",
+    "Auditores",
+    "Consultores empresariales",
+    "Gestoría vehicular",
+    "Peritos",
+    "Agrimensores",
+    "Topógrafos",
+    "Fotógrafos profesionales",
+
+    // =========================================================
+    // Eventos y entretenimiento
+    // =========================================================
+    "Fotografía y video de eventos",
+    "Música en vivo",
+    "Animadores infantiles",
+    "Catering",
+    "Decoradores",
+    "Alquiler de livings y mobiliario",
+    "Pastelería para eventos",
+    "Organización de fiestas",
+    "Sonido e iluminación",
+    "Magos / shows",
+    "Carpas y gazebos para eventos",
+    "Bartenders",
+    "Alquiler de vajilla",
+    "Wedding planners",
+    "Food trucks",
+    "Animación para adultos",
+    "Cotillón personalizado",
+    "Escenografía para eventos",
+
+    // =========================================================
+    // Transporte y logística
+    // =========================================================
+    "Fletes",
+    "Mudanzas",
+    "Moto mensajería",
+    "Chofer particular",
+    "Transportes especiales",
+    "Delivery de productos voluminosos",
+    "Transporte de personas",
+    "Transporte de mascotas",
+    "Cargas refrigeradas",
+    "Transporte escolar",
+    "Courier internacional",
+    "Alquiler de camionetas",
+    "Chofer profesional para empresas",
+    "Distribución de correspondencia",
+    "Traslados corporativos",
+    "Camiones con hidrogrúa",
+
+    // =========================================================
+    // Animales y mascotas
+    // =========================================================
+    "Paseadores de perros",
+    "Peluquería canina / felina",
+    "Adiestradores",
+    "Veterinarios a domicilio",
+    "Guarderías caninas",
+    "Venta de alimentos y accesorios",
+    "Educación canina",
+    "Etología animal",
+    "Adopciones responsables",
+    "Fotografía de mascotas",
+    "Hospedaje para mascotas",
+    "Terapias alternativas animales",
+    "Spa para mascotas",
+    "Adiestramiento felino",
+
+    // =========================================================
+    // Estética
+    // =========================================================
+    "Peluquería hombre, mujer y niños",
+    "Barberías",
+    "Cosmetología",
+    "Manicura / Pedicura",
+    "Maquillaje profesional",
+    "Depilación",
+    "Masajes estéticos",
+    "Spa a domicilio",
+    "Estética corporal",
+    "Tratamientos faciales",
+    "Microblading",
+    "Diseño de cejas",
+    "Peinados para eventos",
+    "Uñas esculpidas",
+    "Extensiones de pestañas",
+    "Micropigmentación",
+    "Limpieza facial profunda",
+    "Bronceado sin sol",
+    "Diseño de sonrisa estética",
+
+    // =========================================================
+    // Categorías originales que ya existían
+    // =========================================================
+    "Pastelería",
+    "Huevos de Gallina"
+];
+
+///////////////////////////////////////////////////////////////////////////////////////
 // GET - Listado de todos los servicios
 ///////////////////////////////////////////////////////////////////////////////////////
 
@@ -37,7 +226,6 @@ router.get("/", async (req, res) => {
         const { error } = schema.validate(req.query);
         if (error) return res.status(400).json({ error: error.details[0].message });
 
-        // Construimos el filtro dinámicamente en base a los parámetros enviados
         const filtro = {};
 
         if (req.query.categoria) filtro.categoria = req.query.categoria;
@@ -68,25 +256,21 @@ router.get("/", async (req, res) => {
             filtro.horaHasta = { $gt: req.query.hora };
         }
 
-        // Armamos la clave de cache con los parámetros de búsqueda
         const cacheKey = JSON.stringify({ filtro, limit: req.query.limit, skip: req.query.skip, sort: req.query.sort });
         const cacheResultado = cache.get(cacheKey);
         if (cacheResultado) return res.json(cacheResultado);
 
-        // Construimos la query
         let query = Service.find(filtro);
 
         if (req.query.limit) query = query.limit(Number(req.query.limit));
         if (req.query.skip) query = query.skip(Number(req.query.skip));
-
         if (req.query.sort) {
             const campos = req.query.sort.split(",").join(" ");
             query = query.sort(campos);
         }
 
         const resultado = await query.exec();
-
-        cache.set(cacheKey, resultado); // Guardamos en cache
+        cache.set(cacheKey, resultado);
         res.json(resultado);
     } catch (err) {
         console.error("Error al obtener servicios:", err);
@@ -100,22 +284,17 @@ router.get("/", async (req, res) => {
 
 router.get("/:id", async (req, res) => {
     try {
-        const { id } = req.params; // Extraemos el ID de los parámetros de la URL
+        const { id } = req.params;
 
-        // Validamos que sea un ID de MongoDB válido (24 caracteres hexadecimales)
         if (!id.match(/^[0-9a-fA-F]{24}$/)) {
             return res.status(400).json({ error: "ID inválido" });
         }
 
-        // Buscamos el servicio en la base de datos
         const servicio = await Service.findById(id);
-
-        // Si no se encontró, respondemos con error 404
         if (!servicio) {
             return res.status(404).json({ error: "Servicio no encontrado" });
         }
 
-        // Si se encontró, lo devolvemos en formato JSON
         res.json(servicio);
     } catch (err) {
         console.error("Error al obtener el servicio por ID:", err);
@@ -129,11 +308,12 @@ router.get("/:id", async (req, res) => {
 
 router.post("/", async (req, res) => {
     try {
-        // Validación estricta de los campos obligatorios y sus formatos
+        // NUEVO:
+        // Integramos validación estricta para "categoria".
         const schemaPost = Joi.object({
             nombre: Joi.string().min(3).max(100).required(),
             telefono: Joi.string().pattern(/^\+?\d{7,15}$/).required(),
-            categoria: Joi.string().required(),
+            categoria: Joi.string().valid(...VALID_CATEGORIES).required(), // NUEVO
             tipoServicio: Joi.string().min(5).max(150).required(),
             localidad: Joi.string().min(2).max(100).required(),
             horaDesde: Joi.number().min(0).max(23).required(),
@@ -174,7 +354,7 @@ router.put("/:id", async (req, res) => {
         const schemaPut = Joi.object({
             nombre: Joi.string().min(3).max(100),
             telefono: Joi.string().pattern(/^\+?\d{7,15}$/),
-            categoria: Joi.string(),
+            categoria: Joi.string().valid(...VALID_CATEGORIES), // NUEVO
             tipoServicio: Joi.string().min(5).max(150),
             localidad: Joi.string().min(2).max(100),
             horaDesde: Joi.number().min(0).max(23),
@@ -217,70 +397,3 @@ router.delete("/:id", async (req, res) => {
 ///////////////////////////////////////////////////////////////////////////////////////
 
 module.exports = router;
-
-
-///////////////////////////////////////////////////////////////////////////////////////
-// Mejoras y funcionalidades que se le implementaron al archivo services.js, 
-// divididas en categorías claras para que puedas consultarlas fácilmente.
-///////////////////////////////////////////////////////////////////////////////////////
-
-// Validaciones avanzadas con Joi. Estas validaciones aseguran que los datos que entran al backend sean seguros, coherentes y con el formato correcto.
-// En el método GET:
-// Validación de todos los parámetros de consulta (query) con un esquema Joi
-// Control de tipos (string, number, boolean)
-// Validación de valores permitidos (true, false)
-// Protección contra parámetros inválidos o maliciosos
-// En POST y PUT:
-// Validación estricta de los datos del body (req.body)
-// Validaciones por tipo, longitud mínima y máxima, formato específico
-// Validación lógica (horaHasta debe ser mayor que horaDesde)
-// Validación de formato para telefono y fotoUrl
-
-// Filtros dinámicos avanzados:
-// Permiten búsquedas realistas y precisas, simulando el uso real de la app por usuarios:
-// Buscar por categoría exacta o múltiples categorías (categorias=...)
-// Filtrar por texto con coincidencia parcial (tipoServicioLike, nombre)
-// Filtrar por booleanos: urgencias24hs, localidadesCercanas
-// Filtrar por franja horaria (horaDesde <= hora <= horaHasta)
-// Filtrar por localidad exacta
-
-// Cache con NodeCache:
-// Mejora el rendimiento y reduce la carga en la base de datos para consultas repetidas:
-// Cachea los resultados de consultas GET con clave única basada en filtros, limit, skip y sort
-// Tiempo de vida configurado a 60 segundos por consulta
-// Acelera la respuesta y simula comportamiento de producción con tráfico real
-
-// Consultas optimizadas con Mongoose:
-// Soporte para limit y skip en paginación
-// Soporte para ordenamientos múltiples con sort
-// Uso de índices definidos en el modelo para acelerar búsquedas (ej: nombre, categoria, localidad)
-
-// CRUD completo:
-// Implementación profesional de las 4 operaciones fundamentales
-// GET: recuperar todos los servicios con filtros avanzados
-// POST: crear un nuevo servicio con validación completa
-// PUT: actualizar campos seleccionados de un servicio existente
-// DELETE: eliminar un servicio por ID, con manejo de errores
-
-// Manejo de errores profesional:
-// Respuestas 400 en caso de validación fallida (Joi)
-// Respuestas 404 si no se encuentra un recurso (en PUT o DELETE)
-// Respuestas 500 ante errores inesperados del servidor
-// Consolas con logs útiles para debugging
-
-// Código limpio y comentarios detallados:
-// Código ordenado, legible y dividido en secciones
-// Comentarios explicativos antes y dentro de cada bloque
-// Variables con nombres claros
-// Explicaciones de cada parámetro, filtro y validación
-// Preparado para trabajar en equipo o escalar en el futuro
-
-///////////////////////////////////////////////////////////////////////////////////////
-// ¿Qué ganamos con todo esto?
-// Calidad de datos: la base de datos solo recibe información válida
-// Seguridad: evitás errores por entradas maliciosas o mal formateadas
-// Velocidad: el sistema responde más rápido gracias a índices y cache
-// Mantenibilidad: cualquier otro desarrollador puede leer, entender y continuar tu código sin problemas
-// Escalabilidad: preparado para crecer con más filtros, usuarios o datos sin reescribir todo
-// Nuestro archivo services.js no es solo funcional: es profesional, robusto, seguro y de alta calidad técnica.
-///////////////////////////////////////////////////////////////////////////////////////

@@ -30,18 +30,212 @@ const authMiddleware = require("../middlewares/authMiddleware");
 const logger = require("../utils/logger");
 
 ///////////////////////////////////////////////////////////////////////////////////////
+// NUEVO:
+// Definimos el listado completo de categorías válidas.
+//
+// Esto asegura coherencia entre el modelo Service (Mongoose)
+// y las validaciones Joi del perfil.
+//
+// Nota profesional:
+// En el futuro sería ideal importar este array desde un archivo
+// único (p. ej. categoryGroups.js) para evitar duplicaciones.
+//
+///////////////////////////////////////////////////////////////////////////////////////
+
+const VALID_CATEGORIES = [
+    // =========================================================
+    // Servicios para el hogar
+    // =========================================================
+    "Plomería",
+    "Electricidad",
+    "Herrería",
+    "Carpintería",
+    "Gas",
+    "Informática",
+    "Limpieza doméstica",
+    "Fumigación",
+    "Reparaciones generales",
+    "Climatización (aires, calefacción)",
+    "Colocación de pisos / revestimientos",
+    "Vidriería",
+    "Impermeabilización",
+    "Rejas y estructuras metálicas",
+    "Colocación de cortinas",
+    "Mantenimiento de piletas",
+    "Armado de muebles",
+    "Persianas y toldos",
+
+    // =========================================================
+    // Servicios para el cuidado de la familia
+    // =========================================================
+    "Enfermería",
+    "Medicina a domicilio",
+    "Niñeras",
+    "Acompañante terapéutico",
+    "Psicólogos",
+    "Fonoaudiólogos",
+    "Maestras particulares",
+    "Kinesiología",
+    "Terapias alternativas",
+    "Psicopedagogía",
+    "Fisioterapia",
+    "Cuidadores de adultos mayores",
+    "Acompañamiento escolar",
+    "Logopedas",
+    "Musicoterapia",
+    "Asistencia escolar a domicilio",
+
+    // =========================================================
+    // Lavadero y mantenimiento
+    // =========================================================
+    "Lavadero de ropa",
+    "Lavadero de coches",
+    "Tintorerías",
+    "Limpieza de alfombras y tapizados",
+    "Limpieza industrial / comercial",
+    "Lavado de sillones",
+    "Limpieza de cortinas",
+    "Servicios de planchado",
+    "Lavado de colchones",
+    "Limpieza post obra",
+    "Limpieza de piletas",
+    "Limpieza de vidrios en altura",
+    "Lavado de tapizados de autos",
+    "Limpieza de tanques de agua",
+
+    // =========================================================
+    // Profesionales y técnicos
+    // =========================================================
+    "Abogados",
+    "Contadores",
+    "Traductores",
+    "Asesores impositivos",
+    "Ingenieros",
+    "Arquitectos",
+    "Desarrolladores de software",
+    "Diseñadores gráficos",
+    "Marketing digital",
+    "Reparadores de electrodomésticos",
+    "Técnicos electrónicos",
+    "Electricistas matriculados",
+    "Gestores administrativos",
+    "Técnicos en refrigeración",
+    "Técnicos de PC",
+    "Diseñadores industriales",
+    "Auditores",
+    "Consultores empresariales",
+    "Gestoría vehicular",
+    "Peritos",
+    "Agrimensores",
+    "Topógrafos",
+    "Fotógrafos profesionales",
+
+    // =========================================================
+    // Eventos y entretenimiento
+    // =========================================================
+    "Fotografía y video de eventos",
+    "Música en vivo",
+    "Animadores infantiles",
+    "Catering",
+    "Decoradores",
+    "Alquiler de livings y mobiliario",
+    "Pastelería para eventos",
+    "Organización de fiestas",
+    "Sonido e iluminación",
+    "Magos / shows",
+    "Carpas y gazebos para eventos",
+    "Bartenders",
+    "Alquiler de vajilla",
+    "Wedding planners",
+    "Food trucks",
+    "Animación para adultos",
+    "Cotillón personalizado",
+    "Escenografía para eventos",
+
+    // =========================================================
+    // Transporte y logística
+    // =========================================================
+    "Fletes",
+    "Mudanzas",
+    "Moto mensajería",
+    "Chofer particular",
+    "Transportes especiales",
+    "Delivery de productos voluminosos",
+    "Transporte de personas",
+    "Transporte de mascotas",
+    "Cargas refrigeradas",
+    "Transporte escolar",
+    "Courier internacional",
+    "Alquiler de camionetas",
+    "Chofer profesional para empresas",
+    "Distribución de correspondencia",
+    "Traslados corporativos",
+    "Camiones con hidrogrúa",
+
+    // =========================================================
+    // Animales y mascotas
+    // =========================================================
+    "Paseadores de perros",
+    "Peluquería canina / felina",
+    "Adiestradores",
+    "Veterinarios a domicilio",
+    "Guarderías caninas",
+    "Venta de alimentos y accesorios",
+    "Educación canina",
+    "Etología animal",
+    "Adopciones responsables",
+    "Fotografía de mascotas",
+    "Hospedaje para mascotas",
+    "Terapias alternativas animales",
+    "Spa para mascotas",
+    "Adiestramiento felino",
+
+    // =========================================================
+    // Estética
+    // =========================================================
+    "Peluquería hombre, mujer y niños",
+    "Barberías",
+    "Cosmetología",
+    "Manicura / Pedicura",
+    "Maquillaje profesional",
+    "Depilación",
+    "Masajes estéticos",
+    "Spa a domicilio",
+    "Estética corporal",
+    "Tratamientos faciales",
+    "Microblading",
+    "Diseño de cejas",
+    "Peinados para eventos",
+    "Uñas esculpidas",
+    "Extensiones de pestañas",
+    "Micropigmentación",
+    "Limpieza facial profunda",
+    "Bronceado sin sol",
+    "Diseño de sonrisa estética",
+
+    // =========================================================
+    // Categorías originales
+    // =========================================================
+    "Pastelería",
+    "Huevos de Gallina"
+];
+
+///////////////////////////////////////////////////////////////////////////////////////
 // Definimos el esquema Joi para validar el update del perfil
 //
 // Importante:
 // → No permitimos modificar el teléfono porque es la clave de autenticación.
 //
-// Los campos opcionales permiten editar solo lo que el usuario desee cambiar.
+// NUEVO:
+// Ahora la validación de "categoria" se hace estricta usando .valid(...VALID_CATEGORIES).
+//
+// Esto impide que se graben categorías inexistentes.
 //
 ///////////////////////////////////////////////////////////////////////////////////////
 
 const profileUpdateSchema = Joi.object({
     nombre: Joi.string().min(3).max(100),
-    categoria: Joi.string(),
+    categoria: Joi.string().valid(...VALID_CATEGORIES), // NUEVO: validación estricta
     tipoServicio: Joi.string(),
     localidad: Joi.string(),
     horarios: Joi.string(),
@@ -67,10 +261,8 @@ const profileUpdateSchema = Joi.object({
 
 router.get("/", authMiddleware, async (req, res) => {
     try {
-        // Tomamos el teléfono del token JWT
         const telefono = req.user.telefono;
 
-        // Buscamos el Service asociado
         const service = await Service.findOne({
             telefono,
             deleted: false
@@ -108,7 +300,6 @@ router.get("/", authMiddleware, async (req, res) => {
 
 router.put("/", authMiddleware, async (req, res) => {
     try {
-        // Validamos el body recibido
         const { error, value } = profileUpdateSchema.validate(req.body, {
             abortEarly: false
         });
@@ -118,10 +309,8 @@ router.put("/", authMiddleware, async (req, res) => {
             return res.status(400).json({ errores });
         }
 
-        // Tomamos el teléfono del token JWT
         const telefono = req.user.telefono;
 
-        // Buscamos el Service del usuario
         const service = await Service.findOne({
             telefono,
             deleted: false
@@ -131,7 +320,6 @@ router.put("/", authMiddleware, async (req, res) => {
             return res.status(404).json({ error: "Perfil no encontrado." });
         }
 
-        // Actualizamos SOLO los campos enviados en el body
         Object.keys(value).forEach(key => {
             service[key] = value[key];
         });
@@ -169,10 +357,8 @@ router.put("/", authMiddleware, async (req, res) => {
 
 router.delete("/", authMiddleware, async (req, res) => {
     try {
-        // Tomamos el teléfono del token JWT
         const telefono = req.user.telefono;
 
-        // Buscamos el Service del usuario
         const service = await Service.findOne({
             telefono,
             deleted: false
@@ -182,7 +368,6 @@ router.delete("/", authMiddleware, async (req, res) => {
             return res.status(404).json({ error: "Perfil no encontrado." });
         }
 
-        // Marcamos soft delete
         service.deleted = true;
         service.deletedAt = new Date();
 
@@ -224,10 +409,8 @@ router.delete("/", authMiddleware, async (req, res) => {
 
 router.delete("/cleanup", authMiddleware, async (req, res) => {
     try {
-        // Calculamos la fecha límite → 30 días atrás
         const fechaLimite = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
 
-        // Ejecutamos el borrado definitivo
         const result = await Service.deleteMany({
             deleted: true,
             deletedAt: { $lte: fechaLimite }
