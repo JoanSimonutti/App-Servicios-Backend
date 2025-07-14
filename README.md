@@ -1,10 +1,10 @@
-## App-Servicios-Backend
+# App-Servicios-Backend
 
 Backend profesional diseñado para gestionar un catálogo de prestadores de servicios y registrar interacciones de usuarios.
 
 Permite crear, almacenar, consultar, filtrar, modificar y eliminar perfiles de prestadores con toda su información, de forma segura y eficiente.
 
-### Tecnologías utilizadas
+## Tecnologías utilizadas
 
 Este backend está desarrollado sobre tecnologías modernas como:
 
@@ -16,7 +16,7 @@ Este backend está desarrollado sobre tecnologías modernas como:
 - Autenticación segura basada en tokens (JWT).
 - Sistema de caché para mejorar el rendimiento.
 
-### Funcionalidades principales
+## Funcionalidades principales
 
 - Gestión completa de prestadores de servicios, incluyendo:
   - Creación y edición de perfiles.
@@ -27,14 +27,14 @@ Este backend está desarrollado sobre tecnologías modernas como:
 - Seguridad robusta para proteger los datos de la aplicación.
 - Rendimiento optimizado para soportar alta demanda.
 
-### Seguridad
+## Seguridad
 
 - Protección de rutas y datos mediante JWT.
 - Limitación de peticiones para evitar abusos (rate limiting).
 - Validación exhaustiva de datos para prevenir errores y ataques.
 - Configuración segura de variables de entorno.
 
-### Para quién está pensado
+## Resultado
 
 Este backend está diseñado para:
 
@@ -45,8 +45,11 @@ Este backend está diseñado para:
 
 ---
 
+<div align="end">
+
 Creado por [Joan Simonutti](https://www.linkedin.com/in/joansimonutti/) | 2025
 
+</div>
 <!--
 ## App-Servicios-Backend
 
