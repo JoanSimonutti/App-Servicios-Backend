@@ -1,8 +1,8 @@
 # App-Servicios-Backend
 
-- Backend profesional diseñado para gestionar un catálogo de prestadores de servicios y registrar interacciones de usuarios.
+**Backend profesional diseñado para gestionar un catálogo de prestadores de servicios y registrar interacciones de usuarios.**
 
-- Permite crear, almacenar, consultar, filtrar, modificar y eliminar perfiles de prestadores con toda su información, de forma segura y eficiente.
+**Permite crear, almacenar, consultar, filtrar, modificar y eliminar perfiles de prestadores con toda su información, de forma segura y eficiente.**
 
 ## Tecnologías utilizadas
 
