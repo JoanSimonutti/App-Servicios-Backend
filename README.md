@@ -1,5 +1,55 @@
 ## App-Servicios-Backend
 
+Backend profesional diseñado para gestionar un catálogo de prestadores de servicios y registrar interacciones de usuarios.
+
+Permite crear, almacenar, consultar, filtrar, modificar y eliminar perfiles de prestadores con toda su información, de forma segura y eficiente.
+
+### Tecnologías utilizadas
+
+Este backend está desarrollado sobre tecnologías modernas como:
+
+- **Node.js** y **Express.js** para construir la API.
+- **MongoDB Atlas** para el almacenamiento de datos.
+- **Mongoose** para modelar y validar la información.
+- Herramientas de seguridad como Helmet y CORS.
+- Envío de SMS mediante integración con Twilio.
+- Autenticación segura basada en tokens (JWT).
+- Sistema de caché para mejorar el rendimiento.
+
+### Funcionalidades principales
+
+- Gestión completa de prestadores de servicios, incluyendo:
+  - Creación y edición de perfiles.
+  - Filtros por categoría, localidad y horario.
+  - Búsquedas inteligentes por nombre o tipo de servicio.
+- Registro de interacciones de usuarios, como clics para contacto.
+- Sistema de autenticación mediante código SMS.
+- Seguridad robusta para proteger los datos de la aplicación.
+- Rendimiento optimizado para soportar alta demanda.
+
+### Seguridad
+
+- Protección de rutas y datos mediante JWT.
+- Limitación de peticiones para evitar abusos (rate limiting).
+- Validación exhaustiva de datos para prevenir errores y ataques.
+- Configuración segura de variables de entorno.
+
+### Para quién está pensado
+
+Este backend está diseñado para:
+
+- Ser desplegado en servidores de producción o utilizado localmente para pruebas y desarrollo.
+- Integrarse fácilmente con aplicaciones frontend modernas (por ejemplo, desarrolladas en React).
+- Soportar tráfico real y crecer en volumen de datos sin perder rendimiento.
+- Ofrecer métricas y estadísticas sobre la interacción de usuarios con los prestadores.
+
+---
+
+Creado por [Joan Simonutti](https://www.linkedin.com/in/joansimonutti/) | 2025
+
+<!--
+## App-Servicios-Backend
+
 - Backend profesional diseñado para gestionar un catálogo de prestadores de servicios y registrar interacciones de usuarios.
 
 - Permite crear, almacenar, consultar, filtrar, modificar y eliminar perfiles de prestadores con toda su información.
@@ -314,12 +364,10 @@ Devuelve todos los servicios donde el tipo de servicio contiene la palabra `aire
 
 **Este backend está preparado para:**
 
-- Estar desplegado en Render.
-- Ser ejecutado localmente para implementar cambios y pruebas sin afectar el entorno de producción.
-- Soportar tráfico real de usuarios.
-- Ser consumido por un frontend moderno.
-- Ofrecer estadísticas reales sobre el contacto a prestadores.
-- Escalar a mayores volúmenes de datos.
+- Ejecutarse en producción o localmente sin afectar entornos reales.
+- Soportar tráfico real y escalar a grandes volúmenes de datos.
+- Integrarse con frontends modernos como React.
+- Ofrecer estadísticas reales sobre interacciones con prestadores.
 
 ---
 
@@ -328,3 +376,4 @@ Devuelve todos los servicios donde el tipo de servicio contiene la palabra `aire
 Creado por [Joan Simonutti](https://www.linkedin.com/in/joansimonutti/) | 2025
 
 </div>
+ -->
